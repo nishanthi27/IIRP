@@ -1,0 +1,55 @@
+text,category
+database connection timeout,database
+jdbc connection failed,database
+unable to connect database,database
+database unreachable,database
+sql connection refused,database
+connection pool exhausted,database
+database server not responding,database
+failed to establish jdbc connection,database
+mysql connection timeout,database
+postgres database unavailable,database
+
+dns lookup failed,network
+network unreachable,network
+host unreachable,network
+connection refused by server,network
+packet loss detected,network
+gateway timeout,network
+unable to reach remote host,network
+network latency too high,network
+socket connection failed,network
+ip address not reachable,network
+
+out of memory exception,memory
+heap memory exceeded,memory
+memory allocation failed,memory
+java heap space error,memory
+garbage collection overhead limit exceeded,memory
+memory leak suspected,memory
+insufficient memory available,memory
+application ran out of memory,memory
+memory threshold exceeded,memory
+ram usage critical,memory
+
+authentication failure,security
+unauthorized login attempt,security
+invalid access token,security
+multiple failed login attempts,security
+suspicious user activity detected,security
+token validation failed,security
+possible brute force attack,security
+access denied due to invalid credentials,security
+security policy violation,security
+user account locked after failed logins,security
+
+application crashed unexpectedly,application
+null pointer exception occurred,application
+service failed to start,application
+internal server error detected,application
+application process terminated,application
+dependency injection failed,application
+configuration file missing,application
+microservice unavailable,application
+unexpected runtime exception,application
+application startup failed,application
