@@ -4,109 +4,90 @@ import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
-
-
-# ==========================
-# STEP 1: LOAD DATASET
-# ==========================
+from sklearn.metrics import accuracy_score
 
 df = pd.read_csv("data/incidents.csv")
 
-print("Dataset Loaded Successfully")
-print(df.head())
-
-
-# ==========================
-# STEP 2: FEATURES & LABELS
-# ==========================
-
 X = df["text"]
-y = df["category"]
 
+y_category = df["category"]
 
-# ==========================
-# STEP 3: TRAIN TEST SPLIT
-# ==========================
+y_severity = df["severity"]
 
-X_train, X_test, y_train, y_test = train_test_split(
+X_train, X_test, y_cat_train, y_cat_test = train_test_split(
     X,
-    y,
+    y_category,
+    test_size=0.2,
+    random_state=42,
+    stratify=y_category
+)
+
+_, _, y_sev_train, y_sev_test = train_test_split(
+    X,
+    y_severity,
     test_size=0.2,
     random_state=42
 )
 
-print(f"\nTraining Records: {len(X_train)}")
-print(f"Testing Records: {len(X_test)}")
-
-
-# ==========================
-# STEP 4: TF-IDF
-# ==========================
-
 vectorizer = TfidfVectorizer()
 
-# Learn vocabulary from training data
 X_train_vectorized = vectorizer.fit_transform(X_train)
 
-# Use same vocabulary on test data
 X_test_vectorized = vectorizer.transform(X_test)
 
-
-# ==========================
-# STEP 5: TRAIN MODEL
-# ==========================
-
-model = RandomForestClassifier(
+# Category Model
+category_model = RandomForestClassifier(
     n_estimators=100,
     random_state=42
 )
 
-model.fit(X_train_vectorized, y_train)
-
-print("\nModel Training Completed")
-
-
-# ==========================
-# STEP 6: EVALUATE MODEL
-# ==========================
-
-predictions = model.predict(X_test_vectorized)
-
-accuracy = accuracy_score(
-    y_test,
-    predictions
+category_model.fit(
+    X_train_vectorized,
+    y_cat_train
 )
 
-print("\nAccuracy:", accuracy)
+# Severity Model
+severity_model = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42
+)
 
-print("\nClassification Report:")
+severity_model.fit(
+    X_train_vectorized,
+    y_sev_train
+)
+
+cat_predictions = category_model.predict(
+    X_test_vectorized
+)
+
+sev_predictions = severity_model.predict(
+    X_test_vectorized
+)
+
 print(
-    classification_report(
-        y_test,
-        predictions
+    "Category Accuracy:",
+    accuracy_score(
+        y_cat_test,
+        cat_predictions
     )
 )
 
-
-# ==========================
-# STEP 7: SAVE VECTORIZER
-# ==========================
+print(
+    "Severity Accuracy:",
+    accuracy_score(
+        y_sev_test,
+        sev_predictions
+    )
+)
 
 with open("models/vectorizer.pkl", "wb") as file:
     pickle.dump(vectorizer, file)
 
-print("\nVectorizer Saved")
+with open("models/category_model.pkl", "wb") as file:
+    pickle.dump(category_model, file)
 
+with open("models/severity_model.pkl", "wb") as file:
+    pickle.dump(severity_model, file)
 
-# ==========================
-# STEP 8: SAVE MODEL
-# ==========================
-
-with open("models/model.pkl", "wb") as file:
-    pickle.dump(model, file)
-
-print("Model Saved")
-
-
-print("\nTraining completed successfully")
+print("Training Completed")

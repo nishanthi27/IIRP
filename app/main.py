@@ -3,36 +3,38 @@ import pickle
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-# Create FastAPI application
 app = FastAPI()
 
-
-# Load vectorizer
 with open("models/vectorizer.pkl", "rb") as file:
     vectorizer = pickle.load(file)
 
-# Load trained model
-with open("models/model.pkl", "rb") as file:
-    model = pickle.load(file)
+with open("models/category_model.pkl", "rb") as file:
+    category_model = pickle.load(file)
+
+with open("models/severity_model.pkl", "rb") as file:
+    severity_model = pickle.load(file)
 
 
-# Request Body
 class IncidentRequest(BaseModel):
     incident: str
 
 
-# API Endpoint
 @app.post("/predict")
 def predict(request: IncidentRequest):
 
-    incident_vector = vectorizer.transform(
+    vector = vectorizer.transform(
         [request.incident]
     )
 
-    prediction = model.predict(
-        incident_vector
-    )
+    category = category_model.predict(
+        vector
+    )[0]
+
+    severity = severity_model.predict(
+        vector
+    )[0]
 
     return {
-        "category": prediction[0]
+        "category": category,
+        "severity": severity
     }
